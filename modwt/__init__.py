@@ -1,6 +1,4 @@
 import numpy as np
-import pdb
-import pywt
 
 
 def upArrow_op(li, j):
@@ -76,15 +74,12 @@ def circular_convolve_s(h_t, g_t, w_j, v_j, j):
     return v_j_1
 
 
-def modwt(x, filters, level):
+def modwt(x, h, g , level):
     '''
     filters: 'db1', 'db2', 'haar', ...
     return: see matlab
     '''
     # filter
-    wavelet = pywt.Wavelet(filters)
-    h = wavelet.dec_hi
-    g = wavelet.dec_lo
     h_t = np.array(h) / np.sqrt(2)
     g_t = np.array(g) / np.sqrt(2)
     wavecoeff = []
@@ -97,12 +92,9 @@ def modwt(x, filters, level):
     return np.vstack(wavecoeff)
 
 
-def imodwt(w, filters):
+def imodwt(w, h, g ):
     ''' inverse modwt '''
     # filter
-    wavelet = pywt.Wavelet(filters)
-    h = wavelet.dec_hi
-    g = wavelet.dec_lo
     h_t = np.array(h) / np.sqrt(2)
     g_t = np.array(g) / np.sqrt(2)
     level = len(w) - 1
@@ -113,12 +105,9 @@ def imodwt(w, filters):
     return v_j
 
 
-def modwtmra(w, filters):
+def modwtmra(w, h, g):
     ''' Multiresolution analysis based on MODWT'''
     # filter
-    wavelet = pywt.Wavelet(filters)
-    h = wavelet.dec_hi
-    g = wavelet.dec_lo
     # D
     level, N = w.shape
     level = level - 1
@@ -144,10 +133,3 @@ def modwtmra(w, filters):
     S = circular_convolve_mra(g_j_t_o, w[-1])
     D.append(S)
     return np.vstack(D)
-
-
-if __name__ == '__main__':
-    s1 = np.arange(10)
-    ws = modwt(s1, 'db2', 3)
-    s1p = imodwt(ws, 'db2')
-    mra = modwtmra(ws, 'db2')
